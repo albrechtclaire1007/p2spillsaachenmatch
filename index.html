@@ -39,12 +39,10 @@
     }
     .audio-button {
       background: #8cc987;
-      color: white;
       border: none;
       border-radius: 50%;
       width: 70px;
       height: 70px;
-      font-size: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -55,6 +53,10 @@
     .audio-button:hover {
       background: #7ab87a;
       transform: scale(1.05);
+    }
+    .audio-button img {
+      width: 38px;
+      height: 38px;
     }
     .grid {
       display: grid;
@@ -71,9 +73,10 @@
       cursor: pointer;
       position: relative;
     }
-    .toy-card.correct {
+    .toy-card.flash {
       border: 4px solid #8cc987;
       background: #d8ebd4;
+      transition: all 0.3s ease;
     }
     .toy-card.wrong {
       border: 4px solid #ff6b6b;
@@ -106,15 +109,18 @@
       text-align: center;
     }
     @media (max-width: 600px) {
-      .audio-button { width: 60px; height: 60px; font-size: 24px; }
+      .audio-button { width: 60px; height: 60px; }
+      .audio-button img { width: 32px; height: 32px; }
       .toy-card img { height: 100px; }
     }
   </style>
 </head>
 <body>
   <div class="game-container">
-    <h1>🎧 Lauschter a klick op déi richteg Spillsaach!</h1>
-    <button class="audio-button" id="audioButton" aria-label="Lauschter">🎧</button>
+    <h1>Lauschter a klick op déi richteg Spillsaach!</h1>
+    <button class="audio-button" id="audioButton" aria-label="Lauschter">
+      <img src="https://freeimage.host/i/KWwexTX" alt="Audio">
+    </button>
     <div class="feedback" id="feedback"></div>
     <div class="grid" id="grid"></div>
   </div>
@@ -137,7 +143,6 @@
       { name: 'Wierfel', image: 'https://i.postimg.cc/vxM8TWhy/temp-Image-Zp-G0-TR.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1wierfel.mp3' }
     ];
 
-    // Randomize the order of play, but keep correct pairings
     let remaining = [...toys];
     let current = null;
     const grid = document.getElementById('grid');
@@ -162,7 +167,7 @@
 
     function playNextAudio() {
       if (remaining.length === 0) {
-        feedback.textContent = '🎉 Super! Du hues all richteg erkannt!';
+        feedback.textContent = 'Super, du hues alles richteg geléist!';
         feedback.className = 'finished';
         audioBtn.disabled = true;
         return;
@@ -177,12 +182,15 @@
     function handleChoice(toy, card) {
       if (!current) return;
       if (toy.name === current.name) {
-        card.classList.add('correct');
+        card.classList.add('flash');
         feedback.textContent = 'Super!';
         feedback.className = 'feedback success';
         remaining = remaining.filter(t => t.name !== toy.name);
         current = null;
-        setTimeout(playNextAudio, 1000);
+        setTimeout(() => {
+          card.classList.remove('flash');
+          playNextAudio();
+        }, 800);
       } else {
         card.classList.add('wrong');
         feedback.textContent = 'Nach eng Kéier probéieren!';
@@ -197,7 +205,6 @@
       audioEl.play();
     });
 
-    // Initialize game
     shuffle(remaining);
     loadGrid();
     playNextAudio();
