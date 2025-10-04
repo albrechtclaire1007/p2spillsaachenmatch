@@ -18,8 +18,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
       min-height: 100vh;
+      justify-content: flex-start;
     }
     h1 {
       text-align: center;
@@ -123,28 +123,27 @@
 
   <script>
     const toys = [
-      { name: 'Teddybier', image: 'https://i.postimg.cc/VSxkQyb8/temp-Image2t-Ew-Ew.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/teddybier1.mp3' },
-      { name: 'Vëlo', image: 'https://i.postimg.cc/7CFZ8vTw/temp-Imagee-DSUs6.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1velo.mp3' },
-      { name: 'Roboter', image: 'https://i.postimg.cc/XB3NqwL4/temp-Image-Jgec-Ta.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1roboter.mp3' },
-      { name: 'Fliger', image: 'https://i.postimg.cc/p9wLbNnb/temp-Image-MIU98-V.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1fliger.mp3' },
-      { name: 'Ball', image: 'https://i.postimg.cc/DW9wkVb3/temp-Image-NAjh-GW.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1ball.mp3' },
-      { name: 'Radio', image: 'https://i.postimg.cc/dkGtJW8B/temp-Imagep2-X0pu.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1radio.mp3' },
-      { name: 'Péssel', image: 'https://i.postimg.cc/tZFC9rhF/temp-Image-PC26-QV.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1pesel.mp3' },
-      { name: 'Wierfel', image: 'https://i.postimg.cc/G8vhbMkx/temp-Image-SMSSD4.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1wierfel.mp3' },
-      { name: 'Popp', image: 'https://i.postimg.cc/Q9cxj6pq/temp-Imagev-ZAm8p.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1popp.mp3' },
-      { name: 'Trommel', image: 'https://i.postimg.cc/xNYj8K5f/temp-Image-W250-J5.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1trommel.mp3' },
-      { name: 'Videospill', image: 'https://i.postimg.cc/vxM8TWhR/temp-Image-Xr-Gmf-G.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1video.mp3' },
-      { name: 'Kaartespill', image: 'https://i.postimg.cc/vxM8TWhy/temp-Image-Zp-G0-TR.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1kaarte.mp3' }
+      { name: 'Kaartespill', image: 'https://i.postimg.cc/VSxkQyb8/temp-Image2t-Ew-Ew.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1kaarte.mp3' },
+      { name: 'Popp', image: 'https://i.postimg.cc/7CFZ8vTw/temp-Imagee-DSUs6.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1popp.mp3' },
+      { name: 'Péssel', image: 'https://i.postimg.cc/XB3NqwL4/temp-Image-Jgec-Ta.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1pesel.mp3' },
+      { name: 'Trommel', image: 'https://i.postimg.cc/p9wLbNnb/temp-Image-MIU98-V.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1trommel.mp3' },
+      { name: 'Fliger', image: 'https://i.postimg.cc/DW9wkVb3/temp-Image-NAjh-GW.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1fliger.mp3' },
+      { name: 'Teddybier', image: 'https://i.postimg.cc/dkGtJW8B/temp-Imagep2-X0pu.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/teddybier1.mp3' },
+      { name: 'Videospill', image: 'https://i.postimg.cc/tZFC9rhF/temp-Image-PC26-QV.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1video.mp3' },
+      { name: 'Ball', image: 'https://i.postimg.cc/G8vhbMkx/temp-Image-SMSSD4.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1ball.mp3' },
+      { name: 'Vëlo', image: 'https://i.postimg.cc/Q9cxj6pq/temp-Imagev-ZAm8p.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1velo.mp3' },
+      { name: 'Radio', image: 'https://i.postimg.cc/xNYj8K5f/temp-Image-W250-J5.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1radio.mp3' },
+      { name: 'Roboter', image: 'https://i.postimg.cc/vxM8TWhR/temp-Image-Xr-Gmf-G.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1roboter.mp3' },
+      { name: 'Wierfel', image: 'https://i.postimg.cc/vxM8TWhy/temp-Image-Zp-G0-TR.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1wierfel.mp3' }
     ];
 
-    const grid = document.getElementById('grid');
-    const feedback = document.getElementById('feedback');
-    const audio = document.getElementById('audio');
-    const audioBtn = document.getElementById('audioButton');
-
+    // Randomize the order of play, but keep correct pairings
     let remaining = [...toys];
     let current = null;
-    let score = 0;
+    const grid = document.getElementById('grid');
+    const feedback = document.getElementById('feedback');
+    const audioEl = document.getElementById('audio');
+    const audioBtn = document.getElementById('audioButton');
 
     function shuffle(array) {
       return array.sort(() => Math.random() - 0.5);
@@ -152,7 +151,7 @@
 
     function loadGrid() {
       grid.innerHTML = '';
-      shuffle(toys).forEach(t => {
+      toys.forEach(t => {
         const card = document.createElement('div');
         card.className = 'toy-card';
         card.innerHTML = `<img src="${t.image}" alt="${t.name}">`;
@@ -161,7 +160,7 @@
       });
     }
 
-    function nextAudio() {
+    function playNextAudio() {
       if (remaining.length === 0) {
         feedback.textContent = '🎉 Super! Du hues all richteg erkannt!';
         feedback.className = 'finished';
@@ -169,8 +168,8 @@
         return;
       }
       current = remaining[Math.floor(Math.random() * remaining.length)];
-      audio.src = current.audio;
-      audio.play();
+      audioEl.src = current.audio;
+      audioEl.play();
       feedback.textContent = 'Wat hues du héieren?';
       feedback.className = 'feedback';
     }
@@ -182,25 +181,27 @@
         feedback.textContent = 'Super!';
         feedback.className = 'feedback success';
         remaining = remaining.filter(t => t.name !== toy.name);
-        score++;
         current = null;
-        setTimeout(nextAudio, 1000);
+        setTimeout(playNextAudio, 1000);
       } else {
         card.classList.add('wrong');
-        setTimeout(() => card.classList.remove('wrong'), 400);
         feedback.textContent = 'Nach eng Kéier probéieren!';
         feedback.className = 'feedback';
+        setTimeout(() => card.classList.remove('wrong'), 400);
       }
     }
 
     audioBtn.addEventListener('click', () => {
       if (!remaining.length) return;
-      audio.currentTime = 0;
-      audio.play();
+      audioEl.currentTime = 0;
+      audioEl.play();
     });
 
+    // Initialize game
+    shuffle(remaining);
     loadGrid();
-    nextAudio();
+    playNextAudio();
   </script>
 </body>
 </html>
+
