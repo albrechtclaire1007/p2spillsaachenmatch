@@ -2,212 +2,6 @@
 <html lang="lb">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spillsaachen – Lauschter a klick!</title>
-  <style>
-    @font-face {
-      font-family: 'Schoulschreft';
-      src: url('https://github.com/albrechtclaire1007/schoulschreft/raw/main/schoulschreft_bold%5B2%5D.TTF') format('truetype');
-      font-weight: bold;
-    }
-
-    /* --- Reframing: fill the whole iframe/page --- */
-    html, body { margin: 0; height: 100%; }
-    .game, .game-container, .container, .wrapper, #app, main {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      max-width: none !important;
-      margin: 0 !important;
-    }
-    .card, .panel, .board, .stage {
-      width: 100% !important;
-      height: 100% !important;
-      max-width: none !important;
-      max-height: none !important;
-      margin: 0 !important;
-      box-shadow: none;
-      background: transparent;
-    }
-    .grid, .items, .tiles {
-      width: 100%;
-      height: 100%;
-      display: grid;
-      place-items: center;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 16px;
-    }
-
-    /* --- App styling --- */
-    body {
-      font-family: 'Schoulschreft', Arial, sans-serif;
-      background: linear-gradient(135deg, #d8ebd4 0%, #8cc987 100%);
-      margin: 0; padding: 20px;
-      display:flex; flex-direction:column; align-items:center; min-height:100vh;
-    }
-    h1 { text-align:center; color:black; margin: 0 0 10px; }
-    .game-container {
-      background:#fff; border-radius:20px; padding:20px; max-width:1000px; width:min(100%, 1000px);
-      height: calc(100vh - 40px);
-      box-shadow:0 8px 25px rgba(0,0,0,.1); display:flex; flex-direction:column; align-items:center; gap:16px;
-    }
-
-    /* Audio button with CSS background (no white edge) */
-    .audio-button{
-      background:#8cc987;
-      border:none; border-radius:50%; width:70px; height:70px;
-      display:flex; align-items:center; justify-content:center; cursor:pointer;
-      transition:transform .2s ease, background-color .2s ease;
-      box-shadow:0 4px 12px rgba(0,0,0,.2);
-      background-image: url('https://i.postimg.cc/kXzQdjQp/temp-Imagef0iu-HC.avif');
-      background-repeat:no-repeat; background-position:center; background-size:70% auto;
-      overflow:hidden;
-    }
-    .audio-button:hover{ background-color:#7ab87a; transform:scale(1.05); }
-
-    .feedback{ font-size:24px; font-weight:bold; color:#333; text-align:center; min-height:30px; }
-    .success{ color:#4CAF50; }
-
-    .grid{ width:100%; flex:1; }
-
-    .toy-card{
-      background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,.1);
-      transition:all .3s ease; cursor:pointer; position:relative;
-    }
-    .toy-card.flash{ border:4px solid #8cc987; background:#d8ebd4; }
-    .toy-card.wrong{ border:4px solid #ff6b6b; background:#ffe0e0; animation:shake .4s ease; }
-    .toy-card img{ width:100%; height:120px; object-fit:contain; background:#f8f8f8; }
-    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-
-    .finished{ font-size:28px; color:#4CAF50; margin-top:10px; text-align:center; }
-
-    @media (max-width:600px){
-      .audio-button{ width:60px; height:60px; }
-      .toy-card img{ height:100px; }
-    }
-  </style>
-</head>
-<body>
-  <div class="game-container">
-    <h1>Lauschter a klick op déi richteg Spillsaach!</h1>
-
-    <button class="audio-button" id="audioButton" aria-label="Lauschter"></button>
-
-    <div class="feedback" id="feedback"></div>
-    <div class="grid" id="grid"></div>
-  </div>
-
-  <audio id="audio" preload="auto" playsinline></audio>
-
-  <script>
-    // --- Data ---
-    const toys = [
-      { name: 'Kaartespill', image: 'https://i.postimg.cc/VSxkQyb8/temp-Image2t-Ew-Ew.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1kaarte.mp3' },
-      { name: 'Popp', image: 'https://i.postimg.cc/7CFZ8vTw/temp-Imagee-DSUs6.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1popp.mp3' },
-      { name: 'Péssel', image: 'https://i.postimg.cc/XB3NqwL4/temp-Image-Jgec-Ta.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1pesel.mp3' },
-      { name: 'Trommel', image: 'https://i.postimg.cc/p9wLbNnb/temp-Image-MIU98-V.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1trommel.mp3' },
-      { name: 'Fliger', image: 'https://i.postimg.cc/DW9wkVb3/temp-Image-NAjh-GW.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1fliger.mp3' },
-      { name: 'Teddybier', image: 'https://i.postimg.cc/dkGtJW8B/temp-Imagep2-X0pu.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/teddybier1.mp3' },
-      { name: 'Videospill', image: 'https://i.postimg.cc/tZFC9rhF/temp-Image-PC26-QV.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1video.mp3' },
-      { name: 'Ball', image: 'https://i.postimg.cc/G8vhbMkx/temp-Image-SMSSD4.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1ball.mp3' },
-      { name: 'Vëlo', image: 'https://i.postimg.cc/Q9cxj6pq/temp-Imagev-ZAm8p.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1velo.mp3' },
-      { name: 'Radio', image: 'https://i.postimg.cc/xNYj8K5f/temp-Image-W250-J5.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1radio.mp3' },
-      { name: 'Roboter', image: 'https://i.postimg.cc/vxM8TWhR/temp-Image-Xr-Gmf-G.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1roboter.mp3' },
-      { name: 'Wierfel', image: 'https://i.postimg.cc/vxM8TWhy/temp-Image-Zp-G0-TR.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1wierfel.mp3' }
-    ];
-
-    // --- Helpers ---
-    const grid = document.getElementById('grid');
-    const feedback = document.getElementById('feedback');
-    const audioBtn = document.getElementById('audioButton');
-    const audioEl = document.getElementById('audio');
-
-    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
-
-    function loadGrid() {
-      grid.innerHTML = '';
-      shuffle([...toys]).forEach(t => {
-        const card = document.createElement('div');
-        card.className = 'toy-card';
-        card.innerHTML = `<img src="${t.image}" alt="${t.name}">`;
-        card.addEventListener('click', () => handleChoice(t, card));
-        grid.appendChild(card);
-      });
-    }
-
-    let remaining = shuffle([...toys]);
-    let current = null;
-
-    function playNextAudio() {
-      if (remaining.length === 0) {
-        feedback.textContent = 'Super, du hues alles richteg geléist!';
-        feedback.className = 'finished';
-        audioBtn.disabled = true;
-        return;
-      }
-      current = remaining.pop();
-      audioEl.src = current.audio;
-      audioEl.play().catch(()=>{ /* will retry on next gesture */ });
-      feedback.textContent = 'Wat hues du héieren?';
-      feedback.className = 'feedback';
-    }
-
-    function handleChoice(toy, card) {
-      if (!current) return;
-      if (toy.name === current.name) {
-        card.classList.add('flash');
-        feedback.textContent = 'Super!';
-        feedback.className = 'feedback success';
-        setTimeout(() => {
-          card.classList.remove('flash');
-          playNextAudio();
-        }, 800);
-      } else {
-        card.classList.add('wrong');
-        feedback.textContent = 'Nach eng Kéier probéieren!';
-        feedback.className = 'feedback';
-        setTimeout(() => card.classList.remove('wrong'), 400);
-      }
-    }
-
-    // --- Robust autoplay unlock ---
-    let unlocked = false;
-    function tryUnlockAndStart() {
-      if (unlocked) return;
-      // try to satisfy autoplay policies
-      audioEl.muted = true;
-      audioEl.play().then(() => {
-        audioEl.pause();
-        audioEl.currentTime = 0;
-        audioEl.muted = false;
-        unlocked = true;
-        playNextAudio(); // start immediately once unlocked
-      }).catch(() => {
-        // still locked; will retry on next gesture
-      });
-    }
-
-    // Attempt on load/visibility (some browsers allow with allow="autoplay")
-    window.addEventListener('load', tryUnlockAndStart);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') tryUnlockAndStart();
-    });
-
-    // Attempt on any plausible user gesture inside the iframe
-    ['pointerdown','pointerup','click','keydown','touchstart','touchend','pointerenter','focus']
-      .forEach(evt => document.addEventListener(evt, tryUnlockAndStart, { once:false, passive:true }));
-
-    // Manual replay button
-    audioBtn.addEventListener('click', () => {
-      if (!current) return;
-      audioEl.currentTime = 0;
-      audioEl.play().catch(()=>{});
-    });
-<!DOCTYPE html>
-<html lang="lb">
-<head>
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Spillsaachen – Lauschter a klick!</title>
   <style>
@@ -257,11 +51,173 @@
     .audio-img:active { transform: scale(0.97); }
     .audio-img[aria-disabled="true"] { opacity: .5; pointer-events: none; }
 
+    .feedback { font-size: 24px; font-weight: bold; color: #333; min-height: 30px; text-align: center; }
+    .success { color: #4CAF50; }
+    .finished { font-size: 28px; color: #4CAF50; margin-top: 6px; text-align: center; }
+
+    .grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .toy-card {
+      background:#fff; border-radius:15px; overflow:hidden;
+      box-shadow:0 4px 10px rgba(0,0,0,.1);
+      transition: all .25s ease; cursor: pointer;
+    }
+    .toy-card img { width:100%; height:120px; object-fit:contain; background:#f8f8f8; display:block; }
+    .toy-card.flash { border:4px solid #8cc987; background:#d8ebd4; }
+    .toy-card.wrong { border:4px solid #ff6b6b; background:#ffe0e0; animation:shake .4s ease; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0) }
+      25% { transform: translateX(-5px) }
+      75% { transform: translateX(5px) }
+    }
+
+    @media (max-width: 600px) {
+      .audio-img { width: 64px; height: 64px; }
+      .toy-card img { height: 100px; }
+      .game-container { min-height: 75vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Lauschter a klick op déi richteg Spillsaach!</h1>
+
+    <!-- Only the image (replaces the old button) -->
+    <img
+      id="audioImg"
+      class="audio-img"
+      src="https://i.postimg.cc/kXzQdjQp/temp-Imagef0iu-HC.avif"
+      alt="Toun nei ofspillen"
+      role="button"
+      tabindex="0"
+    >
+
+    <div class="feedback" id="feedback"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <audio id="audio" preload="auto" playsinline></audio>
+
+  <script>
+    // --- Data ---
+    const toys = [
+      { name: 'Kaartespill', image: 'https://i.postimg.cc/VSxkQyb8/temp-Image2t-Ew-Ew.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1kaarte.mp3' },
+      { name: 'Popp',        image: 'https://i.postimg.cc/7CFZ8vTw/temp-Imagee-DSUs6.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1popp.mp3' },
+      { name: 'Péssel',      image: 'https://i.postimg.cc/XB3NqwL4/temp-Image-Jgec-Ta.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1pesel.mp3' },
+      { name: 'Trommel',     image: 'https://i.postimg.cc/p9wLbNnb/temp-Image-MIU98-V.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1trommel.mp3' },
+      { name: 'Fliger',      image: 'https://i.postimg.cc/DW9wkVb3/temp-Image-NAjh-GW.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1fliger.mp3' },
+      { name: 'Teddybier',   image: 'https://i.postimg.cc/dkGtJW8B/temp-Imagep2-X0pu.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/teddybier1.mp3' },
+      { name: 'Videospill',  image: 'https://i.postimg.cc/tZFC9rhF/temp-Image-PC26-QV.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1video.mp3' },
+      { name: 'Ball',        image: 'https://i.postimg.cc/G8vhbMkx/temp-Image-SMSSD4.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1ball.mp3' },
+      { name: 'Vëlo',        image: 'https://i.postimg.cc/Q9cxj6pq/temp-Imagev-ZAm8p.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1velo.mp3' },
+      { name: 'Radio',       image: 'https://i.postimg.cc/xNYj8K5f/temp-Image-W250-J5.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1radio.mp3' },
+      { name: 'Roboter',     image: 'https://i.postimg.cc/vxM8TWhR/temp-Image-Xr-Gmf-G.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1roboter.mp3' },
+      { name: 'Wierfel',     image: 'https://i.postimg.cc/vxM8TWhy/temp-Image-Zp-G0-TR.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1wierfel.mp3' }
+    ];
+
+    // --- Elements ---
+    const grid = document.getElementById('grid');
+    const feedback = document.getElementById('feedback');
+    const audioImg = document.getElementById('audioImg');
+    const audioEl = document.getElementById('audio');
+
+    // --- Utils ---
+    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+
+    function loadGrid() {
+      grid.innerHTML = '';
+      shuffle([...toys]).forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'toy-card';
+        card.innerHTML = `<img src="${t.image}" alt="${t.name}">`;
+        card.addEventListener('click', () => handleChoice(t, card));
+        grid.appendChild(card);
+      });
+    }
+
+    let remaining = shuffle([...toys]);
+    let current = null;
+    let unlocked = false;
+
+    function playNextAudio() {
+      if (remaining.length === 0) {
+        feedback.textContent = 'Super, du hues alles richteg geléist!';
+        feedback.className = 'finished';
+        audioImg.setAttribute('aria-disabled', 'true');
+        return;
+      }
+      current = remaining.pop();
+      audioEl.src = current.audio;
+      audioEl.play().catch(()=>{ /* retry on next gesture */ });
+      feedback.textContent = 'Wat hues du héieren?';
+      feedback.className = 'feedback';
+    }
+
+    function handleChoice(toy, card) {
+      if (!current) return;
+      if (toy.name === current.name) {
+        card.classList.add('flash');
+        feedback.textContent = 'Super!';
+        feedback.className = 'feedback success';
+        setTimeout(() => {
+          card.classList.remove('flash');
+          playNextAudio();
+        }, 800);
+      } else {
+        card.classList.add('wrong');
+        feedback.textContent = 'Nach eng Kéier probéieren!';
+        feedback.className = 'feedback';
+        setTimeout(() => card.classList.remove('wrong'), 400);
+      }
+    }
+
+    // --- Robust autoplay unlock ---
+    function tryUnlock() {
+      if (unlocked) return;
+      // attempt to satisfy autoplay policy
+      audioEl.muted = true;
+      audioEl.play().then(() => {
+        audioEl.pause();
+        audioEl.currentTime = 0;
+        audioEl.muted = false;
+        unlocked = true;
+        playNextAudio();
+      }).catch(() => {
+        // still blocked; will try again on the next gesture
+      });
+    }
+
+    // Try automatically (works if iframe has allow="autoplay")
+    window.addEventListener('load', tryUnlock);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') tryUnlock();
+    });
+
+    // Try on any plausible user gesture
+    ['pointerdown', 'click', 'keydown', 'touchstart', 'touchend', 'focus']
+      .forEach(evt => document.addEventListener(evt, tryUnlock, { passive: true }));
+
+    // Image acts as replay
+    function replay() {
+      if (!current) return;
+      audioEl.currentTime = 0;
+      audioEl.play().catch(()=>{});
+    }
+    audioImg.addEventListener('click', replay);
+    audioImg.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); replay(); }
+    });
+
     // Init
     loadGrid();
   </script>
 </body>
 </html>
-
-
 
