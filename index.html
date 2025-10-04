@@ -204,6 +204,58 @@
       audioEl.currentTime = 0;
       audioEl.play().catch(()=>{});
     });
+<!DOCTYPE html>
+<html lang="lb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spillsaachen – Lauschter a klick!</title>
+  <style>
+    @font-face {
+      font-family: 'Schoulschreft';
+      src: url('https://github.com/albrechtclaire1007/schoulschreft/raw/main/schoulschreft_bold%5B2%5D.TTF') format('truetype');
+      font-weight: bold;
+    }
+
+    /* Page & centering */
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: 'Schoulschreft', Arial, sans-serif;
+      background: linear-gradient(135deg, #d8ebd4 0%, #8cc987 100%);
+      display: grid;
+      place-items: center;          /* centers the white box */
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* White box (recentred) */
+    .game-container {
+      width: min(100%, 1000px);
+      min-height: 70vh;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    h1 { margin: 0 0 8px; text-align: center; color: #000; }
+
+    /* Audio “button” is now only an image */
+    .audio-img {
+      width: 72px;
+      height: 72px;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+      cursor: pointer;
+      transition: transform .15s ease;
+    }
+    .audio-img:active { transform: scale(0.97); }
+    .audio-img[aria-disabled="true"] { opacity: .5; pointer-events: none; }
 
     // Init
     loadGrid();
