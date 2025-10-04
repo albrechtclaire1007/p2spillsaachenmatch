@@ -21,93 +21,30 @@
       justify-content: flex-start;
       min-height: 100vh;
     }
-    h1 {
-      text-align: center;
-      color: black;
-      margin-bottom: 10px;
-    }
+    h1 { text-align: center; color: black; margin-bottom: 10px; }
     .game-container {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      max-width: 1000px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
+      background: white; border-radius: 20px; padding: 20px; max-width: 1000px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; gap: 20px;
     }
     .audio-button {
-      background: #8cc987;
-      border: none;
-      border-radius: 50%;
-      width: 70px;
-      height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      background: #8cc987; border: none; border-radius: 50%; width: 70px; height: 70px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-    .audio-button:hover {
-      background: #7ab87a;
-      transform: scale(1.05);
-    }
-    .audio-button img {
-      width: 38px;
-      height: 38px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
-      width: 100%;
-    }
+    .audio-button:hover { background: #7ab87a; transform: scale(1.05); }
+    .audio-button img { width: 38px; height: 38px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; }
     .toy-card {
-      background: #fff;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-      cursor: pointer;
-      position: relative;
+      background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease; cursor: pointer; position: relative;
     }
-    .toy-card.flash {
-      border: 4px solid #8cc987;
-      background: #d8ebd4;
-      transition: all 0.3s ease;
-    }
-    .toy-card.wrong {
-      border: 4px solid #ff6b6b;
-      background: #ffe0e0;
-      animation: shake 0.4s ease;
-    }
-    .toy-card img {
-      width: 100%;
-      height: 120px;
-      object-fit: contain;
-      background: #f8f8f8;
-    }
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    .feedback {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-      text-align: center;
-      min-height: 30px;
-    }
+    .toy-card.flash { border: 4px solid #8cc987; background: #d8ebd4; transition: all 0.3s ease; }
+    .toy-card.wrong { border: 4px solid #ff6b6b; background: #ffe0e0; animation: shake 0.4s ease; }
+    .toy-card img { width: 100%; height: 120px; object-fit: contain; background: #f8f8f8; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    .feedback { font-size: 24px; font-weight: bold; color: #333; text-align: center; min-height: 30px; }
     .success { color: #4CAF50; }
-    .finished {
-      font-size: 28px;
-      color: #4CAF50;
-      margin-top: 20px;
-      text-align: center;
-    }
+    .finished { font-size: 28px; color: #4CAF50; margin-top: 20px; text-align: center; }
     @media (max-width: 600px) {
       .audio-button { width: 60px; height: 60px; }
       .audio-button img { width: 32px; height: 32px; }
@@ -119,7 +56,7 @@
   <div class="game-container">
     <h1>Lauschter a klick op déi richteg Spillsaach!</h1>
     <button class="audio-button" id="audioButton" aria-label="Lauschter">
-      <img src="https://postimg.cc/06gvWYS9" alt="Audio">
+      <img src="https://i.postimg.cc/PqJqqKrv/temp-Imageuq-WDFq.avif" alt="Audio">
     </button>
     <div class="feedback" id="feedback"></div>
     <div class="grid" id="grid"></div>
@@ -143,16 +80,18 @@
       { name: 'Wierfel', image: 'https://i.postimg.cc/vxM8TWhy/temp-Image-Zp-G0-TR.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1wierfel.mp3' }
     ];
 
-    let remaining = [...toys];
-    let current = null;
     const grid = document.getElementById('grid');
     const feedback = document.getElementById('feedback');
     const audioEl = document.getElementById('audio');
     const audioBtn = document.getElementById('audioButton');
 
+    // shuffle helper
+    const shuffle = a => a.sort(() => Math.random() - 0.5);
+
+    // randomize grid layout each load
     function loadGrid() {
       grid.innerHTML = '';
-      toys.forEach(t => {
+      shuffle([...toys]).forEach(t => {
         const card = document.createElement('div');
         card.className = 'toy-card';
         card.innerHTML = `<img src="${t.image}" alt="${t.name}">`;
@@ -161,14 +100,18 @@
       });
     }
 
+    // randomize audio order pool each load
+    let remaining = shuffle([...toys]); // shuffled copy
+    let current = null;
+
     function playNextAudio() {
-      if (remaining.length === 0) {
+      if (!remaining.length) {
         feedback.textContent = 'Super, du hues alles richteg geléist!';
         feedback.className = 'finished';
         audioBtn.disabled = true;
         return;
       }
-      current = remaining[Math.floor(Math.random() * remaining.length)];
+      current = remaining.pop(); // follow shuffled order
       audioEl.src = current.audio;
       audioEl.play();
       feedback.textContent = 'Wat hues du héieren?';
@@ -181,8 +124,6 @@
         card.classList.add('flash');
         feedback.textContent = 'Super!';
         feedback.className = 'feedback success';
-        remaining = remaining.filter(t => t.name !== toy.name);
-        current = null;
         setTimeout(() => {
           card.classList.remove('flash');
           playNextAudio();
