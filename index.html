@@ -13,42 +13,35 @@
     body {
       font-family: 'Schoulschreft', Arial, sans-serif;
       background: linear-gradient(135deg, #d8ebd4 0%, #8cc987 100%);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
+      margin: 0; padding: 20px; display:flex; flex-direction:column; align-items:center; min-height:100vh;
     }
-    h1 { text-align: center; color: black; margin-bottom: 10px; }
+    h1 { text-align:center; color:black; margin-bottom:10px; }
     .game-container {
-      background: white; border-radius: 20px; padding: 20px; max-width: 1000px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; gap: 20px;
+      background:#fff; border-radius:20px; padding:20px; max-width:1000px;
+      box-shadow:0 8px 25px rgba(0,0,0,.1); display:flex; flex-direction:column; align-items:center; gap:20px;
     }
-    .audio-button {
-      background: #8cc987; border: none; border-radius: 50%; width: 70px; height: 70px;
-      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    .audio-button{
+      background:#8cc987;border:none;border-radius:50%;width:70px;height:70px;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s ease;
+      box-shadow:0 4px 12px rgba(0,0,0,.2); overflow:hidden; /* clip any white edge */
     }
-    .audio-button:hover { background: #7ab87a; transform: scale(1.05); }
-    .audio-button img { width: 38px; height: 38px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; }
-    .toy-card {
-      background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: all 0.3s ease; cursor: pointer; position: relative;
+    .audio-button:hover{ background:#7ab87a; transform:scale(1.05); }
+    .audio-button img{ width:70%; height:70%; object-fit:contain; display:block; pointer-events:none; }
+    .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:15px; width:100%; }
+    .toy-card{
+      background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,.1);
+      transition:all .3s ease; cursor:pointer; position:relative;
     }
-    .toy-card.flash { border: 4px solid #8cc987; background: #d8ebd4; transition: all 0.3s ease; }
-    .toy-card.wrong { border: 4px solid #ff6b6b; background: #ffe0e0; animation: shake 0.4s ease; }
-    .toy-card img { width: 100%; height: 120px; object-fit: contain; background: #f8f8f8; }
-    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-    .feedback { font-size: 24px; font-weight: bold; color: #333; text-align: center; min-height: 30px; }
-    .success { color: #4CAF50; }
-    .finished { font-size: 28px; color: #4CAF50; margin-top: 20px; text-align: center; }
-    @media (max-width: 600px) {
-      .audio-button { width: 60px; height: 60px; }
-      .audio-button img { width: 32px; height: 32px; }
-      .toy-card img { height: 100px; }
+    .toy-card.flash{ border:4px solid #8cc987; background:#d8ebd4; transition:all .3s ease; }
+    .toy-card.wrong{ border:4px solid #ff6b6b; background:#ffe0e0; animation:shake .4s ease; }
+    .toy-card img{ width:100%; height:120px; object-fit:contain; background:#f8f8f8; }
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+    .feedback{ font-size:24px; font-weight:bold; color:#333; text-align:center; min-height:30px; }
+    .success{ color:#4CAF50; }
+    .finished{ font-size:28px; color:#4CAF50; margin-top:20px; text-align:center; }
+    @media (max-width:600px){
+      .audio-button{ width:60px; height:60px; }
+      .toy-card img{ height:100px; }
     }
   </style>
 </head>
@@ -62,9 +55,25 @@
     <div class="grid" id="grid"></div>
   </div>
 
-  <audio id="audio" preload="auto"></audio>
+  <audio id="audio" preload="auto" playsinline></audio>
 
   <script>
+    // --- AUDIO AUTOPLAY UNLOCK ---
+    let audioReady = false;
+    const audioEl = document.getElementById('audio');
+    function unlockAudioOnce() {
+      if (audioReady) return;
+      audioEl.muted = true;
+      audioEl.play().then(() => {
+        audioEl.pause(); audioEl.currentTime = 0; audioEl.muted = false;
+        audioReady = true;
+        // immediately start first round if grid already loaded
+        if (!started) { started = true; playNextAudio(); }
+      }).catch(()=>{}); // ignored; will retry on next tap
+    }
+    document.addEventListener('pointerdown', unlockAudioOnce, { once:true });
+    document.getElementById('audioButton').addEventListener('click', unlockAudioOnce, { once:true });
+
     const toys = [
       { name: 'Kaartespill', image: 'https://i.postimg.cc/VSxkQyb8/temp-Image2t-Ew-Ew.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1kaarte.mp3' },
       { name: 'Popp', image: 'https://i.postimg.cc/7CFZ8vTw/temp-Imagee-DSUs6.avif', audio: 'https://github.com/albrechtclaire1007/p1spillsaachen/raw/main/1popp.mp3' },
@@ -82,13 +91,10 @@
 
     const grid = document.getElementById('grid');
     const feedback = document.getElementById('feedback');
-    const audioEl = document.getElementById('audio');
     const audioBtn = document.getElementById('audioButton');
 
-    // shuffle helper
     const shuffle = a => a.sort(() => Math.random() - 0.5);
 
-    // randomize grid layout each load
     function loadGrid() {
       grid.innerHTML = '';
       shuffle([...toys]).forEach(t => {
@@ -100,20 +106,21 @@
       });
     }
 
-    // randomize audio order pool each load
-    let remaining = shuffle([...toys]); // shuffled copy
+    let remaining = shuffle([...toys]); // shuffled order for rounds
     let current = null;
+    let started = false;
 
     function playNextAudio() {
-      if (!remaining.length) {
+      if (!audioReady) return;   // wait until unlocked
+      if (remaining.length === 0) {
         feedback.textContent = 'Super, du hues alles richteg geléist!';
         feedback.className = 'finished';
         audioBtn.disabled = true;
         return;
       }
-      current = remaining.pop(); // follow shuffled order
+      current = remaining.pop();
       audioEl.src = current.audio;
-      audioEl.play();
+      audioEl.play().catch(()=>{});
       feedback.textContent = 'Wat hues du héieren?';
       feedback.className = 'feedback';
     }
@@ -137,14 +144,14 @@
     }
 
     audioBtn.addEventListener('click', () => {
-      if (!remaining.length) return;
+      if (!audioReady) return unlockAudioOnce();
+      if (!current) return; // nothing queued
       audioEl.currentTime = 0;
-      audioEl.play();
+      audioEl.play().catch(()=>{});
     });
 
     loadGrid();
-    playNextAudio();
+    // autoplay will start right after first user gesture unlocks audio
   </script>
 </body>
 </html>
-
