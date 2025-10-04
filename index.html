@@ -11,7 +11,6 @@
       font-weight: bold;
     }
 
-    /* Page & centering */
     html, body { height: 100%; margin: 0; }
     body {
       font-family: 'Schoulschreft', Arial, sans-serif;
@@ -20,12 +19,13 @@
       place-items: center;          /* centers the white box */
       padding: 20px;
       box-sizing: border-box;
+      user-select: none;
     }
 
-    /* White box (recentred) */
+    /* White box (centered) */
     .game-container {
       width: min(100%, 1000px);
-      min-height: 70vh;
+      min-height: clamp(520px, 80vh, 900px);
       background: #fff;
       border-radius: 20px;
       box-shadow: 0 8px 25px rgba(0,0,0,.1);
@@ -33,27 +33,26 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
     h1 { margin: 0 0 8px; text-align: center; color: #000; }
 
-    /* Audio “button” is now only an image */
+    /* Audio image (no button element) */
     .audio-img {
       width: 72px;
       height: 72px;
       display: block;
-      user-select: none;
-      -webkit-user-drag: none;
       cursor: pointer;
+      -webkit-user-drag: none;
       transition: transform .15s ease;
     }
     .audio-img:active { transform: scale(0.97); }
     .audio-img[aria-disabled="true"] { opacity: .5; pointer-events: none; }
 
-    .feedback { font-size: 24px; font-weight: bold; color: #333; min-height: 30px; text-align: center; }
+    .feedback { font-size: 22px; font-weight: bold; color: #333; min-height: 28px; text-align: center; }
     .success { color: #4CAF50; }
-    .finished { font-size: 28px; color: #4CAF50; margin-top: 6px; text-align: center; }
+    .finished { font-size: 26px; color: #4CAF50; margin-top: 6px; text-align: center; }
 
     .grid {
       width: 100%;
@@ -61,6 +60,7 @@
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 16px;
       align-items: stretch;
+      margin-top: 6px;
     }
 
     .toy-card {
@@ -78,18 +78,20 @@
       75% { transform: translateX(5px) }
     }
 
+    /* Fill-iframe helpers (optional; safe to keep) */
+    .container, .wrapper, #app, main { max-width: none !important; }
+
     @media (max-width: 600px) {
       .audio-img { width: 64px; height: 64px; }
       .toy-card img { height: 100px; }
-      .game-container { min-height: 75vh; }
     }
   </style>
 </head>
 <body>
-  <div class="game-container">
+  <div class="game-container" id="gameBox">
     <h1>Lauschter a klick op déi richteg Spillsaach!</h1>
 
-    <!-- Only the image (replaces the old button) -->
+    <!-- Only the image (clickable) -->
     <img
       id="audioImg"
       class="audio-img"
@@ -99,7 +101,7 @@
       tabindex="0"
     >
 
-    <div class="feedback" id="feedback"></div>
+    <div class="feedback" id="feedback">Tipps: Tippe fir ze starten 🎧</div>
     <div class="grid" id="grid"></div>
   </div>
 
@@ -128,7 +130,13 @@
     const audioImg = document.getElementById('audioImg');
     const audioEl = document.getElementById('audio');
 
-    // --- Utils ---
+    // --- State ---
+    let remaining = [];
+    let current = null;
+    let started = false;
+    let unlocked = false;
+
+    // --- Helpers ---
     const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
     function loadGrid() {
@@ -142,9 +150,23 @@
       });
     }
 
-    let remaining = shuffle([...toys]);
-    let current = null;
-    let unlocked = false;
+    function startGame() {
+      if (started) return;
+      started = true;
+      feedback.textContent = 'Wat hues du héieren?';
+      remaining = shuffle([...toys]);
+      playNextAudio(); // start immediately on first gesture
+    }
+
+    function tryUnlockAudio() {
+      if (unlocked) return;
+      audioEl.muted = true;
+      audioEl.play().then(() => {
+        audioEl.pause(); audioEl.currentTime = 0;
+        audioEl.muted = false;
+        unlocked = true;
+      }).catch(() => { /* ignore; gesture playback will still work */ });
+    }
 
     function playNextAudio() {
       if (remaining.length === 0) {
@@ -155,67 +177,54 @@
       }
       current = remaining.pop();
       audioEl.src = current.audio;
-      audioEl.play().catch(()=>{ /* retry on next gesture */ });
-      feedback.textContent = 'Wat hues du héieren?';
-      feedback.className = 'feedback';
+
+      // If unlocked, play immediately; otherwise this call is still tied to user gesture if startGame was triggered by click/touch.
+      const p = audioEl.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {/* silently ignore */});
     }
 
     function handleChoice(toy, card) {
-      if (!current) return;
+      if (!started || !current) return;
       if (toy.name === current.name) {
         card.classList.add('flash');
         feedback.textContent = 'Super!';
-        feedback.className = 'feedback success';
+        feedback.classList.add('success');
         setTimeout(() => {
           card.classList.remove('flash');
+          feedback.classList.remove('success');
           playNextAudio();
-        }, 800);
+        }, 650);
       } else {
         card.classList.add('wrong');
         feedback.textContent = 'Nach eng Kéier probéieren!';
-        feedback.className = 'feedback';
-        setTimeout(() => card.classList.remove('wrong'), 400);
+        setTimeout(() => card.classList.remove('wrong'), 350);
       }
     }
 
-    // --- Robust autoplay unlock ---
-    function tryUnlock() {
-      if (unlocked) return;
-      // attempt to satisfy autoplay policy
-      audioEl.muted = true;
-      audioEl.play().then(() => {
-        audioEl.pause();
+    // --- Wire up gestures to start + unlock ---
+    const startAndUnlock = () => { startGame(); tryUnlockAudio(); };
+
+    ['pointerdown','click','touchstart','keydown','focus']
+      .forEach(evt => document.addEventListener(evt, startAndUnlock, { passive: true }));
+
+    audioImg.addEventListener('click', (e) => {
+      if (!started) { startAndUnlock(); return; }
+      // Replay current audio
+      if (current) {
         audioEl.currentTime = 0;
-        audioEl.muted = false;
-        unlocked = true;
-        playNextAudio();
-      }).catch(() => {
-        // still blocked; will try again on the next gesture
-      });
-    }
-
-    // Try automatically (works if iframe has allow="autoplay")
-    window.addEventListener('load', tryUnlock);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') tryUnlock();
+        const p = audioEl.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      }
     });
 
-    // Try on any plausible user gesture
-    ['pointerdown', 'click', 'keydown', 'touchstart', 'touchend', 'focus']
-      .forEach(evt => document.addEventListener(evt, tryUnlock, { passive: true }));
-
-    // Image acts as replay
-    function replay() {
-      if (!current) return;
-      audioEl.currentTime = 0;
-      audioEl.play().catch(()=>{});
-    }
-    audioImg.addEventListener('click', replay);
     audioImg.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); replay(); }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        audioImg.click();
+      }
     });
 
-    // Init
+    // Init UI
     loadGrid();
   </script>
 </body>
