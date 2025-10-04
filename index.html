@@ -200,5 +200,16 @@
 
     // Manual replay button
     audioBtn.addEventListener('click', () => {
+      if (!current) return;
+      audioEl.currentTime = 0;
+      audioEl.play().catch(()=>{});
+    });
+
+    // Init
+    loadGrid();
+  </script>
+</body>
+</html>
+
 
 
